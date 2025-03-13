@@ -1,35 +1,24 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
 import { LoginAccount } from "@/config/applicant";
 import { saveUserInfo } from "@/zustand/store/store.provider";
 import { useNavigate } from "react-router-dom";
 
-interface LoginFormState {
-  email: string;
-  password: string;
-  rememberMe: boolean;
+interface ErrorResponse {
+  message?: string;
 }
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const [formData, setFormData] = useState<LoginFormState>({
-    email: "",
-    password: "",
-    rememberMe: false,
-  });
-
-  const [loading, setLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,101 +27,166 @@ export default function LoginPage() {
     toast.dismiss();
 
     try {
-      const formDataToSend = new FormData()
-      formDataToSend.append("email",formData.email)
-      formDataToSend.append("password",formData.password)
-      const response = await LoginAccount(formDataToSend)
+      const formDataToSend = new FormData();
+      formDataToSend.append("email", formData.email);
+      formDataToSend.append("password", formData.password);
+      const response = await LoginAccount(formDataToSend);
 
       if (response) {
         toast.success("Login successful!");
-        saveUserInfo(response.user)
-        localStorage.setItem("token", response.token); 
-        if(response.user.userType === 'applicant'){
-          navigate('/')
-        } else if(response.user.userType === 'admin'){
-          navigate('/Admin/Dashboard')
-        } else if(response.user.userType === 'hr'){
-          navigate('/OfficeHead/Dashboard')
-        }
-      } 
-    } catch (error:any) {
-      console.error(error);
-      toast.error(error.message || "An error occurred. Please try again.");
+        saveUserInfo(response.user);
+        localStorage.setItem("token", response.token);
+        navigate(response.user.userType === "admin" ? "/Admin/Dashboard" : "/");
+      }
+    } catch (error) {
+      const err = error as ErrorResponse;
+      toast.error(err.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen w-full justify-center items-center">
-      <div className="container mx-auto flex items-center gap-8 h-max">
-        <div className="hidden items-center justify-end bg-white md:flex relative">
-          <img src="/signup-1.png" alt="Illustration" className="w-3/4 h-auto z-10" />
-          <div className="absolute inset-0 bg-white opacity-90" />
+    <div className="flex h-screen">
+      {/* Left Side - Gradient Background with Image */}
+      <div
+        className="w-1/2 hidden md:flex bg-cover bg-center relative"
+        style={{
+          backgroundImage:
+            'linear-gradient(to bottom, #e55474, rgba(255, 255, 255, 0.3)), url(/bg.jpg)',
+        }}
+      >
+        {/* Logo */}
+        <img
+          src="/Logowhite.png"
+          alt="Logo"
+          className="absolute"
+          style={{
+            top: "15%",
+            left: "70%",
+            transform: "translate(-50%, -50%)",
+            width: "350px",
+            height: "auto",
+          }}
+        />
+
+        {/* Text Overlays */}
+        <h1
+          className="text-white text-5xl font-bold absolute"
+          style={{
+            top: "var(--text-top, 29%)",
+            left: "var(--text-left, 68%)",
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          HR Applicant
+        </h1>
+        <h1
+          className="text-white text-5xl font-bold absolute"
+          style={{
+            top: "var(--text-top, 37%)",
+            left: "var(--text-left, 20%)",
+            transform: "translate(28%, -50%)",
+          }}
+        >
+          Management System
+        </h1>
+
+        {/* Draggable Text Box */}
+        <div
+          className="absolute bg-white rounded-lg p-4 text-center text-black font-semibold resize"
+          style={{
+            top: "45%",
+            left: "74%",
+            transform: "translate(-50%, -50%)",
+            minWidth: "200px",
+            minHeight: "10px",
+          }}
+        >
+          <h1
+            className="text-white text-3xl font-bold absolute"
+            style={{
+              top: `${300}px`,
+              left: `${-80}px`,
+              transform: "translate(-50%, -50%)",
+              width: "500%",
+              textAlign: "center",
+              cursor: "grab",
+            }}
+          >
+            Manage all new applicants with comfort
+          </h1>
         </div>
-        <div className="w-full md:w-1/2 flex flex-col gap-4 justify-center items-center">
-        <img src="logo.png" className="w-48 mb-2" alt="Logo" />
-        <Card className="flex w-full max-w-2xl py-12 flex-col text-white items-center justify-center  bg-gradient-to-b from-pink-500 to-pink-300 rounded-md">
-          <CardContent className="w-full max-w-xl">
-            <div className="flex flex-col justify-center items-start">
-              <h1 className="text-2xl font-bold">Sign in to account</h1>
-              <p className="mb-6 text-center">
-              Enter your email address & password to login
-              </p>
-            </div>
+      </div>
 
-            <form onSubmit={handleSubmit}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Email</label>
-                <Input
-                  type="email"
-                  name="email"
-                  placeholder="Enter your email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full"
-                  required
-                />
-              </div>
+      {/* Right Side - Login Form */}
+      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-gray-50">
+        <h1 className="text-4xl font-bold mb-4" style={{ color: "#e54f70" }}>
+          Log In
+        </h1>
+        <h2 className="text-lg text-gray-600 mb-8">Login to your account.</h2>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-white">Password</label>
-                <Input
-                  type="password"
-                  name="password"
-                  placeholder="Enter your password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="w-full"
-                  required
-                />
-              </div>
+        <form onSubmit={handleSubmit} className="w-full max-w-sm">
+          {/* Email Input */}
+          <div className="mb-6">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "#e54f70" }}
+            >
+              Email
+            </label>
+            <Input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="h-12 w-full text-base p-3 border border-gray-300 rounded-lg"
+            />
+          </div>
 
-              <div className="flex items-center justify-between text-sm mb-6">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    name="rememberMe"
-                    checked={formData.rememberMe}
-                    onChange={handleChange}
-                    className="mr-2"
-                  />
-                  <span className="text-white">Remember me</span>
-                </div>
-                <a href="#" className="text-white hover:underline">Reset password</a>
-              </div>
+          {/* Password Input */}
+          <div className="mb-6">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: "#e54f70" }}
+            >
+              Password
+            </label>
+            <Input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              className="h-12 w-full text-base p-3 border border-gray-300 rounded-lg"
+            />
+          </div>
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-                {loading ? "Signing In..." : "Sign In"}
-              </Button>
-            </form>
+          {/* Remember Me Checkbox */}
+          <div className="flex items-center mb-6">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              checked={rememberMe}
+              onChange={() => setRememberMe(!rememberMe)}
+              className="mr-2 w-5 h-5 border border-gray-300 rounded"
+            />
+            <label htmlFor="rememberMe" className="text-sm text-gray-700">
+              Remember me
+            </label>
+          </div>
 
-            <div className="text-center mt-6 text-sm text-white">
-              Don't have an account? <a href="/register" className="text-white hover:underline">Sign Up</a>
-            </div>
-          </CardContent>
-        </Card>
-        </div>
+          {/* Sign In Button */}
+          <Button
+            type="submit"
+            className="w-full text-white text-lg py-3 rounded-lg"
+            style={{ backgroundColor: "#e54f70", borderColor: "#e54f70" }}
+            disabled={loading}
+          >
+            {loading ? "Signing In..." : "Sign In"}
+          </Button>
+        </form>
       </div>
     </div>
   );
