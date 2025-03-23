@@ -2,23 +2,33 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 import { LoginAccount } from "@/config/applicant";
 import { saveUserInfo } from "@/zustand/store/store.provider";
 import { useNavigate } from "react-router-dom";
 
-interface ErrorResponse {
-  message?: string;
+interface LoginFormState {
+  email: string;
+  password: string;
+  rememberMe: boolean;
 }
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [formData, setFormData] = useState<LoginFormState>({
+    email: "",
+    password: "",
+    rememberMe: false,
+  });
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,157 +46,114 @@ export default function LoginPage() {
         toast.success("Login successful!");
         saveUserInfo(response.user);
         localStorage.setItem("token", response.token);
-        navigate(response.user.userType === "admin" ? "/Admin/Dashboard" : "/");
+        if (response.user.userType === "applicant") {
+          navigate("/");
+        } else if (response.user.userType === "admin") {
+          navigate("/Admin/Dashboard");
+        } else if (response.user.userType === "hr") {
+          navigate("/OfficeHead/Dashboard");
+        }
       }
-    } catch (error) {
-      const err = error as ErrorResponse;
-      toast.error(err.message || "An error occurred. Please try again.");
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || "An error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex h-screen">
-      {/* Left Side - Gradient Background with Image */}
+    <div className="flex h-screen w-full">
+      {/* Left Side - Background with Geometric Design */}
       <div
-        className="w-1/2 hidden md:flex bg-cover bg-center relative"
+        className="w-1/2 h-full bg-cover bg-center relative"
         style={{
-          backgroundImage:
-            'linear-gradient(to bottom, #e55474, rgba(255, 255, 255, 0.3)), url(/bg.jpg)',
+          backgroundImage: "url('/mnt/data/image.png')",
         }}
       >
-        {/* Logo */}
-        <img
-          src="/Logowhite.png"
-          alt="Logo"
-          className="absolute"
-          style={{
-            top: "15%",
-            left: "70%",
-            transform: "translate(-50%, -50%)",
-            width: "350px",
-            height: "auto",
-          }}
-        />
-
-        {/* Text Overlays */}
-        <h1
-          className="text-white text-5xl font-bold absolute"
-          style={{
-            top: "var(--text-top, 29%)",
-            left: "var(--text-left, 68%)",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          HR Applicant
-        </h1>
-        <h1
-          className="text-white text-5xl font-bold absolute"
-          style={{
-            top: "var(--text-top, 37%)",
-            left: "var(--text-left, 20%)",
-            transform: "translate(28%, -50%)",
-          }}
-        >
-          Management System
-        </h1>
-
-        {/* Draggable Text Box */}
+        {/* Geometric Overlay */}
         <div
-          className="absolute bg-white rounded-lg p-4 text-center text-black font-semibold resize"
+          className="absolute inset-0 bg-[#e65a96] opacity-20"
           style={{
-            top: "45%",
-            left: "74%",
-            transform: "translate(-50%, -50%)",
-            minWidth: "200px",
-            minHeight: "10px",
+            backgroundImage:
+              "linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%), linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%)",
+            backgroundSize: "40px 40px",
           }}
-        >
-          <h1
-            className="text-white text-3xl font-bold absolute"
-            style={{
-              top: `${300}px`,
-              left: `${-80}px`,
-              transform: "translate(-50%, -50%)",
-              width: "500%",
-              textAlign: "center",
-              cursor: "grab",
-            }}
-          >
-            Manage all new applicants with comfort
-          </h1>
-        </div>
+        ></div>
+
+      
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-8 bg-gray-50">
-        <h1 className="text-4xl font-bold mb-4" style={{ color: "#e54f70" }}>
-          Log In
-        </h1>
-        <h2 className="text-lg text-gray-600 mb-8">Login to your account.</h2>
+      <div className="w-1/2 flex items-center justify-center bg-white">
+        <Card className="w-full max-w-md p-8 shadow-lg rounded-lg">
+          <CardContent>
+            <div className="text-center mb-6">
+              <img src="logo.png" className="w-24 mx-auto mb-3" alt="Logo" />
+              <h1 className="text-2xl font-bold text-gray-800">Log In</h1>
+              <p className="text-gray-600">Login to your account</p>
+            </div>
 
-        <form onSubmit={handleSubmit} className="w-full max-w-sm">
-          {/* Email Input */}
-          <div className="mb-6">
-            <label
-              className="block text-sm font-medium mb-2"
-              style={{ color: "#e54f70" }}
-            >
-              Email
-            </label>
-            <Input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              className="h-12 w-full text-base p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Email</label>
+                <Input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full mt-1"
+                  required
+                />
+              </div>
 
-          {/* Password Input */}
-          <div className="mb-6">
-            <label
-              className="block text-sm font-medium mb-2"
-              style={{ color: "#e54f70" }}
-            >
-              Password
-            </label>
-            <Input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              className="h-12 w-full text-base p-3 border border-gray-300 rounded-lg"
-            />
-          </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <Input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full mt-1"
+                  required
+                />
+              </div>
 
-          {/* Remember Me Checkbox */}
-          <div className="flex items-center mb-6">
-            <input
-              type="checkbox"
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={() => setRememberMe(!rememberMe)}
-              className="mr-2 w-5 h-5 border border-gray-300 rounded"
-            />
-            <label htmlFor="rememberMe" className="text-sm text-gray-700">
-              Remember me
-            </label>
-          </div>
+              <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="rememberMe"
+                    checked={formData.rememberMe}
+                    onChange={handleChange}
+                    className="mr-2"
+                  />
+                  <span className="text-gray-700">Remember me</span>
+                </div>
+                <a href="#" className="text-[#e65a96] hover:text-[#d14a86] hover:underline">
+                  Forgot password?
+                </a>
+              </div>
 
-          {/* Sign In Button */}
-          <Button
-            type="submit"
-            className="w-full text-white text-lg py-3 rounded-lg"
-            style={{ backgroundColor: "#e54f70", borderColor: "#e54f70" }}
-            disabled={loading}
-          >
-            {loading ? "Signing In..." : "Sign In"}
-          </Button>
-        </form>
+              <Button
+                type="submit"
+                className="w-full bg-[#e65a96] hover:bg-[#d14a86] text-white"
+                disabled={loading}
+              >
+                {loading ? "Signing In..." : "Sign In"}
+              </Button>
+            </form>
+
+            <div className="text-center mt-4 text-sm text-gray-600">
+              Don't have an account?{" "}
+              <a href="/register" className="text-[#e65a96] hover:text-[#d14a86] hover:underline">
+                Sign Up
+              </a>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
