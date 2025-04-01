@@ -17,12 +17,8 @@ export function Header() {
 
   const baseNavLinks = [
     { label: "Home", path: "/" },
-    { label: "Quick Actions", path: "#quickAction" },
     { label: "Jobs", path: "#jobs" },
-    { label: "Announcement", path: "#announcement" },
     { label: "About", path: "#about" },
-    { label: "Contact", path: "#contact" },
-    { label: "FAQs", path: "#faqs" },
   ]
 
   const authNavLinks = isAuthenticated

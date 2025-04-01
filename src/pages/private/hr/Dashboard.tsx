@@ -144,30 +144,7 @@ export default function HeadDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Example "Recent Activity" Section (Optional) */}
-      <div className="mt-8">
-        <h2 className="mb-2 text-lg font-semibold">Recent Activity</h2>
-        <ul className="space-y-3 text-sm text-gray-700">
-          <li className="flex items-center space-x-2">
-            <CalendarCheck className="h-4 w-4 text-purple-600" />
-            <span>
-              <strong>Interview Scheduled</strong> - Emily Chen (Backend Developer)
-            </span>
-          </li>
-          <li className="flex items-center space-x-2">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <span>
-              <strong>Application Reviewed</strong> - Michael Brown (Frontend Developer)
-            </span>
-          </li>
-          <li className="flex items-center space-x-2">
-            <PlusCircle className="h-4 w-4 text-blue-600" />
-            <span>
-              <strong>New Application</strong> - Sarah Miller (Data Analyst)
-            </span>
-          </li>
-        </ul>
-      </div>
+     
     </div>
   )
 }

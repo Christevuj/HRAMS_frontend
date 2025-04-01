@@ -58,49 +58,8 @@ const Home = () => {
               </CardContent>
             </Card>
 
-            {/* Card 2: My Applications */}
-            <Card className="bg-violet-50 shadow-md">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <Folder className="h-5 w-5 text-violet-700" />
-                  <CardTitle>My Applications</CardTitle>
-                </div>
-                <CardDescription>
-                  View and manage your applications
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="default">View</Button>
-              </CardContent>
-            </Card>
+        
 
-            {/* Card 3: Upload Documents */}
-            <Card className="bg-violet-50 shadow-md">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <Upload className="h-5 w-5 text-violet-700" />
-                  <CardTitle>Upload Documents</CardTitle>
-                </div>
-                <CardDescription>Submit required documents</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="default">Upload</Button>
-              </CardContent>
-            </Card>
-
-            {/* Card 4: Get Help */}
-            <Card className="bg-violet-50 shadow-md">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <HelpCircle className="h-5 w-5 text-violet-700" />
-                  <CardTitle>Get Help</CardTitle>
-                </div>
-                <CardDescription>FAQs and support resources</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="default">View</Button>
-              </CardContent>
-            </Card>
           </div>
           <JobCards />
         </div>

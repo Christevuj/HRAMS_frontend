@@ -48,7 +48,7 @@ import useStore from "@/zustand/store/store";
 import { selector } from "@/zustand/store/store.provider";
 
 export default function ApplicantDetails() {
-  const matchScore = 85;
+
   const user = useStore(selector('user'))
   const { accountId, entryId } = useParams();
   const [info, setInfo] = useState<ApplicantData[]>([]);
@@ -117,32 +117,53 @@ export default function ApplicantDetails() {
   return (
     <div className="container mx-auto space-y-6 p-4 lg:px-12 sm:p-6">
       {/* Header: Title + Action Buttons */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">Applicant Details</h1>
-        {(applicant.status !== 'APPROVED' && user.info.userType !== 'hr') ? <div className="flex space-x-2">
-          <Button
-            disabled={isUpdating}
-            variant="default"
-            onClick={() => handleApplicantStatusChange("APPROVED")}
-          >
-            Approved
-          </Button>
-          <Button
-            disabled={isUpdating}
-            variant="destructive"
-            onClick={() => handleApplicantStatusChange("ARCHIVED")}
-          >
-            Archived
-          </Button>
-          <Button
-            disabled={isUpdating}
-            variant="destructive"
-            onClick={() => handleApplicantStatusChange("REJECTED")}
-          >
-            Reject
-          </Button>
-        </div> : <p className="bg-green-500 border border-green-700 px-4 py-2 rounded-sm text-sm">{applicant.status}</p>}
-      </div>
+<div className="flex items-center justify-between">
+  <h1 className="text-xl font-semibold">Applicant Details</h1>
+
+  {user.info.userType !== "hr" ? (
+    <div className="flex space-x-2">
+      <Button
+        disabled={isUpdating}
+        className={`${
+          applicant.status === "APPROVED"
+            ? "bg-white text-pink-500 border border-pink-500"
+            : "bg-pink-500 text-white"
+        }`}
+        onClick={() => handleApplicantStatusChange("APPROVED")}
+      >
+        Approve
+      </Button>
+
+      <Button
+        disabled={isUpdating}
+        className={`${
+          applicant.status === "ARCHIVED"
+            ? "bg-white text-pink-500 border border-pink-500"
+            : "bg-pink-500 text-white"
+        }`}
+        onClick={() => handleApplicantStatusChange("ARCHIVED")}
+      >
+        Archive
+      </Button>
+
+      <Button
+        disabled={isUpdating}
+        className={`${
+          applicant.status === "REJECTED"
+            ? "bg-white text-pink-500 border border-pink-500"
+            : "bg-pink-500 text-white"
+        }`}
+        onClick={() => handleApplicantStatusChange("REJECTED")}
+      >
+        Reject
+      </Button>
+    </div>
+  ) : (
+    <p className="bg-pink-500 border border-pink-700 px-4 py-2 rounded-sm text-sm text-white">
+      {applicant.status}
+    </p>
+  )}
+</div>
 
       {/* Cards: Name/Position, Applied On, Match Score, Status */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
@@ -185,24 +206,6 @@ export default function ApplicantDetails() {
           </CardFooter>
         </Card>
 
-        {/* Card 3: Match Score */}
-        <Card>
-          <CardHeader className="flex items-center justify-between pb-2">
-            <div>
-              <CardTitle className="text-base">Match Score</CardTitle>
-              <CardDescription>{matchScore}%</CardDescription>
-            </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100">
-              <Activity className="h-5 w-5 text-gray-600" />
-            </div>
-          </CardHeader>
-          <CardFooter className="flex flex-col space-y-1">
-            <Progress value={matchScore} className="w-full" />
-            <p className="text-xs text-gray-500">
-              Based on skills & experience
-            </p>
-          </CardFooter>
-        </Card>
 
         {/* Card 4: Status */}
         <Card>
