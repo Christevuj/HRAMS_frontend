@@ -13,4 +13,12 @@ export const AdminRoutes = [
         path:'/Job-list',
         component: lazy(() => import("../pages/private/admin/Joblist"))
     },
+    {
+        path:'/Admin/Jobs',
+        component: lazy(() => import("../pages/private/admin/Jobs")) // Assuming the file is Jobs.tsx
+    },  
+    {
+        path:'/Admin/Reports',
+        component: lazy(() => import("../pages/private/admin/Reports"))
+    }   
 ]

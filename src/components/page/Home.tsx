@@ -1,12 +1,3 @@
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
-import { FilePlus, Folder, Upload, HelpCircle } from "lucide-react";
 import JobCards from "./JobCards";
 
 const BG_IMAGE_URL = "/bg.jpg";
@@ -38,29 +29,28 @@ const Home = () => {
         </p>
       </div>
 
-      {/* Quick Actions Section (on a light background below the hero) */}
-      <section id="quickAction" className="relative z-10 mt-8 bg-white px-4 py-12">
-        <div className="container mx-auto max-w-7xl">
-          <h2 className="mb-6 text-xl font-bold md:text-2xl">Quick Actions</h2>
+     
+      <section className="relative z-10 mt-8 bg-white px-4 py-12">
+        <div className="container mx-auto max-w-100xl text-left pl-50">
+          <h2 className="mb-4 text-xl font-bold md:text-2xl">Get Started!</h2>
+          <p className="text-gray-700 md:text-lg">
+            1. Choose The Job Position
+          </p>
+          <p className="text-gray-700 md:text-lg">
+            2. Upload the Required Information and Documents
+          </p>
+          <p className="text-gray-700 md:text-lg">
+            3. Submit and Wait for HR Confirmation
+          </p>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {/* Card 1: Apply Now */}
-            <Card className="bg-violet-50 shadow-md">
-              <CardHeader>
-                <div className="flex items-center space-x-2">
-                  <FilePlus className="h-5 w-5 text-violet-700" />
-                  <CardTitle>Apply Now</CardTitle>
-                </div>
-                <CardDescription>Submit a new job application</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button variant="default">Start</Button>
-              </CardContent>
-            </Card>
+         
+          <p className="text-gray-700 md:text-lg mt-8">
+            Your Journey Starts Here. Simple. Secure. Fast
+          </p>
+        </div>
 
-        
-
-          </div>
+        {/* Job Listings */}
+        <div className="mt-12">
           <JobCards />
         </div>
       </section>

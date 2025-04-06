@@ -6,9 +6,11 @@ import { Swiper, SwiperSlide } from "swiper/react"
 import { EffectCoverflow, Pagination, Autoplay } from "swiper/modules"
 import "swiper/css"
 import "swiper/css/pagination"
+import { useNavigate } from "react-router-dom"
 
 export default function JobCards() {
   const [jobsList, setJobsList] = useState<Job[]>([])
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchJobs = async () => {
@@ -23,6 +25,15 @@ export default function JobCards() {
     }
     fetchJobs()
   }, [])
+
+  const handleApplyClick = (job: Job) => {
+    navigate("/application_form", {
+      state: {
+        jobPosition: job.position,
+        jobDepartment: job.department,
+      },
+    })
+  }
 
   return (
     <div className="w-full px-4 py-20">
@@ -61,7 +72,11 @@ export default function JobCards() {
                 </div>
               </div>
               <div className="mt-6">
-                <Button variant="default" className="bg-black text-white hover:bg-gray-800">
+                <Button
+                  variant="default"
+                  className="bg-black text-white hover:bg-gray-800"
+                  onClick={() => handleApplyClick(job)}
+                >
                   Apply Now
                 </Button>
               </div>

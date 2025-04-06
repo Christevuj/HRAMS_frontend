@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/zustand/store/store.provider";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const AdminHeader = () => {
   const navigate = useNavigate();
@@ -63,38 +63,29 @@ const AdminHeader = () => {
 
           {/* Navigation Menu */}
           <nav className="flex space-x-4">
-            <a
-              href="/Admin/Dashboard"
+            <Link
+              to="/Admin/Dashboard"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Dashboard
-            </a>
-            <a
-              href="#"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              Applications
-            </a>
-            <a
-              href="/Job-list"
+            </Link>
+            <Link
+              to="/Admin/Jobs" // Update the link to go to the Jobs page
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Jobs
-            </a>
-            <a
-              href="#"
+            </Link>
+            <Link
+              to="/Admin/Reports"  
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Reports
-            </a>
+            </Link>
           </nav>
         </div>
 
         {/* Right: Settings, Add New, Logout, Avatar */}
         <div className="flex items-center space-x-4">
-          <Button className="bg-[#e65a96] hover:bg-[#d14a86] text-white">
-            Settings
-          </Button>
           <Button className="bg-[#e65a96] hover:bg-[#d14a86] text-white" onClick={handleAddNew}>
             Add New Job
           </Button>

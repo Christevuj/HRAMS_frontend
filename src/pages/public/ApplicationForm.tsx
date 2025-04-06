@@ -1,18 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { FileDragger } from "@/components/ui/file_dragger";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AllOpenJobs } from "@/config/admin";
 import { SubmitApplicationRegistry } from "@/config/applicant";
-import { AllOpenJobsResponse, Job } from "@/types";
 import useStore from "@/zustand/store/store";
 import { selector } from "@/zustand/store/store.provider";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 export default function ApplicationForm() {
-  const navigate = useNavigate()
+  const location = useLocation();
+  const { jobPosition, jobDepartment } = location.state || {};
+  const navigate = useNavigate();
   const user = useStore(selector("user"));
+
   const [formData, setFormData] = useState({
     lastName: "",
     firstName: "",
@@ -21,9 +23,10 @@ export default function ApplicationForm() {
     contactNumber: "",
     address: "",
     degree: "",
-    job:"",
-    department:""
+    job: jobPosition || "",
+    department: jobDepartment || "",
   });
+
   const [files, setFiles] = useState<{
     transcriptRecord: File | null;
     diploma: File | null;
@@ -35,22 +38,8 @@ export default function ApplicationForm() {
     applicationLetter: null,
     resume: null,
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-    const [jobsList, setJobsList] = useState<Job[]>([])
-  
-    useEffect(() => {
-      const fetchJobs = async () => {
-        try {
-          const res: AllOpenJobsResponse = await AllOpenJobs()
-          if (res && res.success === 1) {
-            setJobsList(res.results)
-          }
-        } catch (error) {
-          console.error("Error fetching jobs:", error)
-        }
-      }
-      fetchJobs()
-    }, [])
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -62,6 +51,7 @@ export default function ApplicationForm() {
   const handleFileChange = (field: string, file: File | null) => {
     setFiles((prev) => ({ ...prev, [field]: file }));
   };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -87,8 +77,8 @@ export default function ApplicationForm() {
         contactNumber: "",
         address: "",
         degree: "",
-        job:"",
-        department:""
+        job: "",
+        department: "",
       });
       setFiles({
         transcriptRecord: null,
@@ -96,7 +86,7 @@ export default function ApplicationForm() {
         applicationLetter: null,
         resume: null,
       });
-      navigate('/My-Application')
+      navigate("/My-Application");
     } catch (error: any) {
       console.error("Error submitting application:", error);
       toast.error(`Error submitting application: ${error.message}`);
@@ -108,9 +98,9 @@ export default function ApplicationForm() {
   const handleCancel = () => {
     console.log("Canceled");
   };
+
   return (
     <div className="mx-auto max-w-2xl p-4">
-      {/* Back button */}
       <button
         onClick={() => window.history.back()}
         className="mb-4 flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-800"
@@ -132,7 +122,6 @@ export default function ApplicationForm() {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Basic fields */}
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
             Last Name
@@ -231,36 +220,24 @@ export default function ApplicationForm() {
             </SelectContent>
           </Select>
         </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium text-gray-700">
-            Select Job
+            Job Position
           </label>
-          <Select
+          <input
+            type="text"
+            name="job"
+            readOnly
             value={formData.job}
-            onValueChange={(value) => {
-              const selectedJob = jobsList.find((job) => job.position === value);
-              setFormData((prev) => ({
-                ...prev,
-                job: value,
-                department: selectedJob ? selectedJob.department : ""
-              }));
-            }}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select your job" />
-            </SelectTrigger>
-            <SelectContent>
-              {jobsList.map((job) => (
-                <SelectItem key={job.jobId} value={job.position}>
-                  {job.position}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            className="w-full rounded border border-gray-300 p-2 text-sm bg-gray-100"
+          />
         </div>
-        {formData.job && (
+        {formData.department && (
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Department</label>
+            <label className="mb-1 block text-sm font-medium text-gray-700">
+              Department
+            </label>
             <input
               type="text"
               name="department"
@@ -311,7 +288,6 @@ export default function ApplicationForm() {
           }
         />
 
-        {/* Terms and Conditions */}
         <div className="mt-6 text-sm">
           <h2 className="mb-2 font-semibold">Terms and Conditions</h2>
           <ol className="list-decimal space-y-1 pl-4 text-gray-700">
@@ -328,7 +304,6 @@ export default function ApplicationForm() {
           </ol>
         </div>
 
-        {/* Acknowledgement */}
         <div className="mt-4 text-sm">
           <h2 className="mb-2 font-semibold">Acknowledgement</h2>
           <p className="text-gray-700">
@@ -341,7 +316,6 @@ export default function ApplicationForm() {
           </p>
         </div>
 
-        {/* Action buttons */}
         <div className="mt-6 flex items-center space-x-2">
           <button
             type="submit"

@@ -64,37 +64,26 @@ export default function LoginPage() {
 
   return (
     <div className="flex h-screen w-full">
-      {/* Left Side - Background with Geometric Design */}
+      {/* Left Side - Image Background */}
       <div
-        className="w-1/2 h-full bg-cover bg-center relative"
+        className="w-1/2 h-full bg-cover bg-center"
         style={{
-          backgroundImage: "url('/mnt/data/image.png')",
+          backgroundImage: "url('/login_bg.png')",
         }}
-      >
-        {/* Geometric Overlay */}
-        <div
-          className="absolute inset-0 bg-[#e65a96] opacity-20"
-          style={{
-            backgroundImage:
-              "linear-gradient(135deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%), linear-gradient(45deg, transparent 50%, rgba(255, 255, 255, 0.1) 50%)",
-            backgroundSize: "40px 40px",
-          }}
-        ></div>
-
-      
-      </div>
+      ></div>
 
       {/* Right Side - Login Form */}
-      <div className="w-1/2 flex items-center justify-center bg-white">
-        <Card className="w-full max-w-md p-8 shadow-lg rounded-lg">
-          <CardContent>
-            <div className="text-center mb-6">
-              <img src="logo.png" className="w-24 mx-auto mb-3" alt="Logo" />
-              <h1 className="text-2xl font-bold text-gray-800">Log In</h1>
-              <p className="text-gray-600">Login to your account</p>
-            </div>
+<div className="w-1/2 flex items-center justify-center bg-white">
+<Card className="w-full max-w-xl min-h-[32rem] p-10 rounded-2xl flex flex-col justify-center bg-white border-0 shadow-none">
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+    <CardContent>
+    <div className="text-center mb-8">
+  <h1 className="text-5xl font-bold text-gray-800 mb-4">Log In</h1>
+  <p className="text-gray-600">Login to your account</p>
+</div>
+
+
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700">Email</label>
                 <Input
@@ -146,12 +135,7 @@ export default function LoginPage() {
               </Button>
             </form>
 
-            <div className="text-center mt-4 text-sm text-gray-600">
-              Don't have an account?{" "}
-              <a href="/register" className="text-[#e65a96] hover:text-[#d14a86] hover:underline">
-                Sign Up
-              </a>
-            </div>
+
           </CardContent>
         </Card>
       </div>
