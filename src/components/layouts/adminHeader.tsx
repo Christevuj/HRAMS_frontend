@@ -4,16 +4,17 @@ import { Button } from "@/components/ui/button";
 import { logoutUser } from "@/zustand/store/store.provider";
 import toast from "react-hot-toast";
 import { useNavigate, Link } from "react-router-dom";
+import { CreateJob } from "@/config/admin";
 
 const AdminHeader = () => {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [jobData, setJobData] = useState({
-    jobId: "",
+    position: "",
     department: "",
     status: "",
-    created: "",
     requirements: "",
+    type: "",
   });
 
   const handleLogout = () => {
@@ -29,11 +30,11 @@ const AdminHeader = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setJobData({
-      jobId: "",
+      position: "",
       department: "",
       status: "",
-      created: "",
       requirements: "",
+      type: "",
     }); // Reset the form fields when closing the modal
   };
 
@@ -45,10 +46,17 @@ const AdminHeader = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Handle the submission logic here
-    console.log("Submitted Job Data:", jobData);
-    handleCloseModal();
+  // Add the handleSubmit function here
+  const handleSubmit = async () => {
+    try {
+      console.log("Submitting job data:", jobData); // Debugging log
+      const response = await CreateJob(jobData); // Call the CreateJob function
+      toast.success(response.message || "Job created successfully.");
+      handleCloseModal(); // Close the modal after successful submission
+    } catch (error: any) {
+      console.error("Error creating job:", error);
+      toast.error(error.message || "An error occurred while creating the job.");
+    }
   };
 
   return (
@@ -70,13 +78,13 @@ const AdminHeader = () => {
               Dashboard
             </Link>
             <Link
-              to="/Admin/Jobs" // Update the link to go to the Jobs page
+              to="/Admin/Jobs"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Jobs
             </Link>
             <Link
-              to="/Admin/Reports"  
+              to="/Admin/Reports"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Reports
@@ -105,62 +113,67 @@ const AdminHeader = () => {
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h2 className="text-xl font-bold mb-4">Add New Job</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Job ID</label>
-                <input
-                  type="text"
-                  name="jobId"
-                  value={jobData.jobId}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
-                  placeholder="Enter Job ID"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Department</label>
-                <input
-                  type="text"
-                  name="department"
-                  value={jobData.department}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
-                  placeholder="Enter Department"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Status</label>
-                <input
-                  type="text"
-                  name="status"
-                  value={jobData.status}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
-                  placeholder="Enter Status"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Created</label>
-                <input
-                  type="text"
-                  name="created"
-                  value={jobData.created}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
-                  placeholder="Enter Created Date"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Requirements</label>
-                <textarea
-                  name="requirements"
-                  value={jobData.requirements}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
-                  placeholder="Enter Requirements"
-                  rows={3}
-                />
-              </div>
-            </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Position</label>
+    <input
+      type="text"
+      name="position"
+      value={jobData.position}
+      onChange={handleInputChange}
+      className="w-full p-2 border border-gray-300 rounded mt-1"
+      placeholder="Enter Position"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Department</label>
+    <input
+      type="text"
+      name="department"
+      value={jobData.department}
+      onChange={handleInputChange}
+      className="w-full p-2 border border-gray-300 rounded mt-1"
+      placeholder="Enter Department"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Status</label>
+    <input
+      type="text"
+      name="status"
+      value={jobData.status}
+      onChange={handleInputChange}
+      className="w-full p-2 border border-gray-300 rounded mt-1"
+      placeholder="Enter Status"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Type</label>
+    <input
+      type="text"
+      name="type"
+      value={jobData.type}
+      onChange={handleInputChange}
+      className="w-full p-2 border border-gray-300 rounded mt-1"
+      placeholder="Enter Job Type"
+      required
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium text-gray-700">Requirements</label>
+    <textarea
+      name="requirements"
+      value={jobData.requirements}
+      onChange={handleInputChange}
+      className="w-full p-2 border border-gray-300 rounded mt-1"
+      placeholder="Enter Requirements"
+      rows={3}
+      required
+    />
+  </div>
+</div>
             <div className="flex justify-end space-x-4 mt-6">
               <Button className="bg-[#e65a96] hover:bg-[#d14a86] text-white" onClick={handleCloseModal}>
                 Cancel

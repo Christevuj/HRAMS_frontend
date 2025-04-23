@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FileDragger } from "@/components/ui/file_dragger";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SubmitApplicationRegistry } from "@/config/applicant";
-import useStore from "@/zustand/store/store";
-import { selector } from "@/zustand/store/store.provider";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -13,7 +10,6 @@ export default function ApplicationForm() {
   const location = useLocation();
   const { jobPosition, jobDepartment } = location.state || {};
   const navigate = useNavigate();
-  const user = useStore(selector("user"));
 
   const [formData, setFormData] = useState({
     lastName: "",
@@ -66,8 +62,17 @@ export default function ApplicationForm() {
           submissionData.append(key, file);
         }
       });
-      submissionData.append("accountId", user.info?.accountId);
-      await SubmitApplicationRegistry(submissionData);
+  
+      const response = await fetch("http://localhost:3006/api/v1/applicant/submit-applicant-registry", {
+        method: "POST",
+        body: submissionData,
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to submit application");
+      }
+  
       toast.success("Application submitted successfully!");
       setFormData({
         lastName: "",

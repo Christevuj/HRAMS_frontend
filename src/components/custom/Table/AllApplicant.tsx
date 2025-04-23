@@ -177,15 +177,13 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
                   <TableCell>{dateStringFormatter(app.entryCreatedAt)}</TableCell>
                   <TableCell>{app.documents?.length || 0}</TableCell>
                   <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      onClick={() =>
-                        navigate(`/ApplicantDetails/${app.accountId}/${app.entryId}`)
-                      }
-                      size="icon"
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+                  <Button
+                  variant="ghost"
+                  onClick={() => navigate(`/ApplicantDetails/${app.entryId}`)}
+                  size="icon"
+                  >
+                 <Eye className="h-4 w-4" />
+                  </Button>
                   </TableCell>
                 </TableRow>
               ))}

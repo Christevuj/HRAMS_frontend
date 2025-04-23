@@ -6,8 +6,8 @@ export const AdminRoutes = [
         component: lazy(() => import("../pages/private/admin/Dashboard"))
     },
     {
-        path:'/ApplicantDetails/:accountId/:entryId',
-        component: lazy(() => import("../pages/private/admin/ApplicantDetails"))
+        path: '/ApplicantDetails/:entryId',
+  component: lazy(() => import("../pages/private/admin/ApplicantDetails")),
     },
     {
         path:'/Job-list',

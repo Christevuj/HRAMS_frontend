@@ -20,7 +20,7 @@ import { selector } from "@/zustand/store/store.provider";
 export default function ApplicantDetails() {
   const navigate = useNavigate(); // Use navigate to go back to the previous page or dashboard
   const user = useStore(selector("user"));
-  const { accountId, entryId } = useParams();
+  const {entryId } = useParams();
   const [info, setInfo] = useState<ApplicantData[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<ApplicantDocument | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
@@ -28,7 +28,7 @@ export default function ApplicantDetails() {
 
   const Fetch = async () => {
     try {
-      const res = await ApplicantList(accountId, entryId);
+      const res = await ApplicantList( entryId);
       if (res?.results) setInfo(res.results);
     } catch (error) {
       console.error("Error fetching applicant:", error);
@@ -37,7 +37,7 @@ export default function ApplicantDetails() {
 
   useEffect(() => {
     Fetch();
-  }, [accountId, entryId]);
+  }, [entryId]);
 
   const applicant = info[0];
   if (!applicant) return <div className="p-4">No applicant found.</div>;
@@ -86,7 +86,7 @@ export default function ApplicantDetails() {
           <div className="space-y-5">
             <h2 className="text-xl font-semibold text-gray-800 mb-6">Personal Information</h2>
             <div className="space-y-4 text-base text-gray-700">
-              <p><span className="font-medium">Full Name:</span> {fullName}</p>
+              <p><span className="font-medium">Full Name:</span> {applicant.fullName}</p>
               <p><span className="font-medium">Email:</span> {applicant.email}</p>
               <p><span className="font-medium">Phone:</span> {applicant.contactNumber}</p>
               <p><span className="font-medium">Address:</span> {applicant.completeAddress}</p>
