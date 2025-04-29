@@ -113,7 +113,6 @@ export default function AdminDashboard() {
           <TabsList className="mb-4">
             <TabsTrigger className="px-8" value="all">All Applications</TabsTrigger>
             <TabsTrigger className="px-8" value="pending">Pending</TabsTrigger>
-
             <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
             <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
             <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
