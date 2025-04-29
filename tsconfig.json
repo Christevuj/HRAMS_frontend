@@ -8,6 +8,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "esModuleInterop": true, // Enables compatibility with CommonJS modules
+    "moduleResolution": "node" // Ensures proper module resolution
   }
 }
