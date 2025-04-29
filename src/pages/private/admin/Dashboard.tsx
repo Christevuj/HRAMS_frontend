@@ -109,36 +109,47 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Tabs */}
       <Tabs className="w-full" defaultValue="pending">
         <TabsList className="mb-4">
           <TabsTrigger className="px-8" value="pending">Pending</TabsTrigger>
-          <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
-          <TabsTrigger className="px-8" value="hired">Hired</TabsTrigger>
-          <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
           <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
-          <TabsTrigger className="px-8" value="history">History</TabsTrigger>
+          <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
+          <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger className="px-8" value="hired">Hired</TabsTrigger>
+          <TabsTrigger className="px-8" value="all">History</TabsTrigger>
         </TabsList>
 
+        {/* All Applications Tab */}
+        <TabsContent value="all">
+          <AllApplicantTable allApps={allApps} />
+        </TabsContent>
+
+        {/* Pending Tab */}
         <TabsContent value="pending">
           <PendingApplicantTable pendingApps={pendingApps} />
         </TabsContent>
-        <TabsContent value="approved">
-          <ApprovedApplicantTable approvedApps={approvedApps} />
-        </TabsContent>
-        <TabsContent value="hired">
-          <HiredApplicantTable hiredApps={hiredApps} />
-        </TabsContent>
-        <TabsContent value="rejected">
-          <RejectedApplicantTable rejectedApps={rejectedApps} />
-        </TabsContent>
+
+        {/* Archived Tab */}
         <TabsContent value="archived">
           <ArchivedApplicantTable archivedApps={shortlistedApps} />
         </TabsContent>
-        <TabsContent value="history">
-          <AllApplicantTable allApps={[...approvedApps, ...rejectedApps, ...shortlistedApps, ...hiredApps]} />
+
+        {/* Approved Tab */}
+        <TabsContent value="approved">
+          <ApprovedApplicantTable approvedApps={approvedApps} />
+        </TabsContent>
+
+        {/* Rejected Tab */}
+        <TabsContent value="rejected">
+          <RejectedApplicantTable rejectedApps={rejectedApps} />
+        </TabsContent>
+
+        {/* Hired Tab */}
+        <TabsContent value="hired">
+          <HiredApplicantTable hiredApps={hiredApps} />
         </TabsContent>
       </Tabs>
-
     </div>
   )
 }
