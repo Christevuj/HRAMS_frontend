@@ -29,10 +29,8 @@ const RejectedApplicantTable = ({
 }) => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  // State for selected row IDs (using unique entryId as string)
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
-  // No data design component
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
       <Inbox className="h-12 w-12 text-gray-400" />
@@ -40,19 +38,16 @@ const RejectedApplicantTable = ({
     </div>
   );
 
-  // Filter rejected apps based on the selected category if provided
   const filteredApps = selectedCategory
     ? rejectedApps.filter((app) => app.applyingFor === selectedCategory)
     : rejectedApps;
 
-  // Check if all filtered rows are selected
   const allSelected =
     filteredApps.length > 0 &&
     filteredApps.every((app) =>
       selectedRowIds.includes(app.entryId.toString())
     );
 
-  // Toggle selection of a single row
   const toggleRow = (entryId: number) => {
     const idStr = entryId.toString();
     setSelectedRowIds((prev) =>
@@ -62,7 +57,6 @@ const RejectedApplicantTable = ({
     );
   };
 
-  // Toggle selection of all rows in the filtered list
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const allIds = filteredApps.map((app) => app.entryId.toString());
@@ -72,9 +66,38 @@ const RejectedApplicantTable = ({
     }
   };
 
+  const handleExport = () => {
+    const selectedApps = rejectedApps.filter((app) =>
+      selectedRowIds.includes(app.entryId.toString())
+    );
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [
+        ["Full Name", "Degree", "Category", "Status", "Date Applied", "Documents"],
+        ...selectedApps.map((app) => [
+          app.fullName,
+          app.educationDegree,
+          app.applyingFor,
+          app.status,
+          dateStringFormatter(app.entryCreatedAt),
+          app.documents?.length || 0,
+        ]),
+      ]
+        .map((row) => row.join(","))
+        .join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "rejected_applicants.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div>
-      {/* Search, Category Filter, Filter & Export Row */}
       <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
         <Input type="text" placeholder="Search applicants" className="flex-1" />
         <Select
@@ -85,21 +108,21 @@ const RejectedApplicantTable = ({
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Bachelors">
-              Administrative Assistant
-            </SelectItem>
+            <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
             <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">
-              College Instructors
-            </SelectItem>
+            <SelectItem value="CollegeInstructors">College Instructors</SelectItem>
             <SelectItem value="CollegeFaculty">College Faculty</SelectItem>
           </SelectContent>
         </Select>
-        <Button>Filter</Button>
-        <Button variant="outline">Export</Button>
+        {/* Removed Filter Button */}
+        <Button
+          className="bg-black text-white hover:bg-gray-800"
+          onClick={handleExport}
+        >
+          Export
+        </Button>
       </div>
 
-      {/* Bulk Action Bar */}
       {selectedRowIds.length > 0 && (
         <div className="mb-4 flex items-center justify-between rounded bg-blue-50 p-2">
           <p className="text-sm text-blue-700">
@@ -116,7 +139,6 @@ const RejectedApplicantTable = ({
         </div>
       )}
 
-      {/* Render Table or No Data Message */}
       {filteredApps.length === 0 ? (
         <NoDataDesign message="No applications found." />
       ) : (
@@ -124,7 +146,6 @@ const RejectedApplicantTable = ({
           <Table>
             <TableHeader>
               <TableRow>
-                {/* Header checkbox for selecting/deselecting all rows */}
                 <TableHead>
                   <input
                     type="checkbox"
@@ -144,11 +165,7 @@ const RejectedApplicantTable = ({
             </TableHeader>
             <TableBody>
               {filteredApps.map((app, i) => (
-                <TableRow
-                  key={i}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  {/* Row Checkbox */}
+                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
                   <TableCell>
                     <input
                       type="checkbox"
@@ -163,9 +180,7 @@ const RejectedApplicantTable = ({
                   <TableCell>
                     <Badge variant="outline">{app.status}</Badge>
                   </TableCell>
-                  <TableCell>
-                    {dateStringFormatter(app.entryCreatedAt)}
-                  </TableCell>
+                  <TableCell>{dateStringFormatter(app.entryCreatedAt)}</TableCell>
                   <TableCell>{app.documents?.length || 0}</TableCell>
                   <TableCell className="text-right">
                     <Button

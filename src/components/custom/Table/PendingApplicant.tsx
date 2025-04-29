@@ -21,6 +21,8 @@ import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const PendingApplicantTable = ({
   pendingApps,
@@ -29,10 +31,8 @@ const PendingApplicantTable = ({
 }) => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  // Track selected row IDs using the unique entryId (as a string)
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
-  // Component for "no data" state
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
       <Inbox className="h-12 w-12 text-gray-400" />
@@ -40,19 +40,16 @@ const PendingApplicantTable = ({
     </div>
   );
 
-  // Filter pending applications by category if one is selected
   const filteredApps = selectedCategory
     ? pendingApps.filter((app) => app.applyingFor === selectedCategory)
     : pendingApps;
 
-  // Determine if all filtered rows are selected
   const allSelected =
     filteredApps.length > 0 &&
     filteredApps.every((app) =>
       selectedRowIds.includes(app.entryId.toString())
     );
 
-  // Toggle selection of a single row by entryId
   const toggleRow = (entryId: number) => {
     const idStr = entryId.toString();
     setSelectedRowIds((prev) =>
@@ -62,7 +59,6 @@ const PendingApplicantTable = ({
     );
   };
 
-  // Toggle selection of all rows in filteredApps
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const allIds = filteredApps.map((app) => app.entryId.toString());
@@ -72,9 +68,28 @@ const PendingApplicantTable = ({
     }
   };
 
+  const handleExport = () => {
+    const exportData = filteredApps.map((app) => ({
+      Name: app.fullName,
+      Degree: app.educationDegree,
+      Category: app.applyingFor,
+      Status: app.status,
+      "Date Applied": dateStringFormatter(app.entryCreatedAt),
+      "Document Count": app.documents?.length || 0,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Pending Applicants");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "PendingApplicants.xlsx");
+  };
+
   return (
     <div>
-      {/* Search, Category Filter, and Action Buttons */}
+      {/* Search and Category Filter */}
       <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
         <Input type="text" placeholder="Search applicants" className="flex-1" />
         <Select
@@ -95,11 +110,16 @@ const PendingApplicantTable = ({
             <SelectItem value="CollegeFaculty">College Faculty</SelectItem>
           </SelectContent>
         </Select>
-        <Button>Filter</Button>
-        <Button variant="outline">Export</Button>
+        <Button
+          variant="default"
+          style={{ backgroundColor: "black", color: "white" }}
+          onClick={handleExport}
+        >
+          Export
+        </Button>
       </div>
 
-      {/* Bulk Action Bar (if rows are selected) */}
+      {/* Bulk Action Bar */}
       {selectedRowIds.length > 0 && (
         <div className="mb-4 flex items-center justify-between rounded bg-blue-50 p-2">
           <p className="text-sm text-blue-700">
@@ -120,7 +140,7 @@ const PendingApplicantTable = ({
         </div>
       )}
 
-      {/* Render Table or No Data Message */}
+      {/* Table or No Data */}
       {filteredApps.length === 0 ? (
         <NoDataDesign message="No applications found." />
       ) : (
@@ -128,7 +148,6 @@ const PendingApplicantTable = ({
           <Table>
             <TableHeader>
               <TableRow>
-                {/* Header checkbox for select all */}
                 <TableHead>
                   <input
                     type="checkbox"
@@ -149,7 +168,6 @@ const PendingApplicantTable = ({
             <TableBody>
               {filteredApps.map((app, i) => (
                 <TableRow key={i} className="hover:bg-gray-50 transition-colors">
-                  {/* Row checkbox */}
                   <TableCell>
                     <input
                       type="checkbox"

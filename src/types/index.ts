@@ -18,6 +18,7 @@ export interface ApplicantData {
   }
 
   export interface ApplicantDocument {
+    name: any
     id: number
     fileName: string
     fileUrl: string

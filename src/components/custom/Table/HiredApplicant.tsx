@@ -1,5 +1,3 @@
-import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,35 +16,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AllOpenJobsResponse, ApplicantData, Job } from "@/types";
+import { ApplicantData } from "@/types";
 import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { AllOpenJobs } from "@/config/admin";
+import { useState } from "react";
+import * as XLSX from "xlsx"; // Importing xlsx library
 
-const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
+const HiredApplicantTable = ({
+  hiredApps,
+}: {
+  hiredApps: ApplicantData[]; // Replaced approvedApps with hiredApps
+}) => {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [searchText, setSearchText] = useState<string>("");
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
-  const [jobsList, setJobsList] = useState<Job[]>([]);
 
-  useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const res: AllOpenJobsResponse = await AllOpenJobs();
-        if (res && res.success === 1) {
-          setJobsList(res.results);
-        }
-      } catch (error) {
-        console.error("Error fetching jobs:", error);
-      }
-    };
-
-    fetchJobs();
-  }, []);
-
+  // No Data design component
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
       <Inbox className="h-12 w-12 text-gray-400" />
@@ -54,25 +40,27 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
     </div>
   );
 
-  const selectedJob = jobsList.find((job) => job.position === selectedCategory);
+  // Filter hired applications by category (applyingFor)
+  const filteredApps = selectedCategory
+    ? hiredApps.filter((app) => app.applyingFor === selectedCategory)
+    : hiredApps;
 
-  const filteredApps = allApps.filter((app) => {
-    const matchesCategory = selectedCategory ? app.applyingFor === selectedCategory : true;
-    const matchesSearch = app.fullName.toLowerCase().includes(searchText.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
-
+  // Determine if all filtered rows are selected
   const allSelected =
     filteredApps.length > 0 &&
     filteredApps.every((app) => selectedRowIds.includes(app.entryId.toString()));
 
+  // Toggle selection for a single row
   const toggleRow = (entryId: number) => {
     const idStr = entryId.toString();
     setSelectedRowIds((prev) =>
-      prev.includes(idStr) ? prev.filter((id) => id !== idStr) : [...prev, idStr]
+      prev.includes(idStr)
+        ? prev.filter((id) => id !== idStr)
+        : [...prev, idStr]
     );
   };
 
+  // Toggle select/deselect all rows in filteredApps
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
       const allIds = filteredApps.map((app) => app.entryId.toString());
@@ -82,59 +70,43 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
     }
   };
 
-  const handleExport = () => {
-    const exportData = filteredApps.map((app) => ({
+  // Export to Excel function
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(filteredApps.map((app) => ({
       Name: app.fullName,
       Degree: app.educationDegree,
       Category: app.applyingFor,
-      Department: app.department,
       Status: app.status,
       "Date Applied": dateStringFormatter(app.entryCreatedAt),
-      "Document Count": app.documents?.length || 0,
-    }));
-
-    const ws = XLSX.utils.json_to_sheet(exportData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Applicants");
-
-    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(data, "Applicants.xlsx");
+      Documents: app.documents?.length || 0,
+    })));
+    XLSX.utils.book_append_sheet(wb, ws, "Hired Applicants"); // Renamed sheet to Hired Applicants
+    XLSX.writeFile(wb, "hired_applicants.xlsx"); // Renamed file to hired_applicants.xlsx
   };
 
   return (
     <div>
       {/* Search and Filter Row */}
       <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
-        <Input
-          type="text"
-          placeholder="Search applicants"
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          className="flex-1"
-        />
-        <Select onValueChange={(value) => setSelectedCategory(value)} defaultValue="">
+        <Input type="text" placeholder="Search applicants" className="flex-1" />
+        <Select
+          onValueChange={(value) => setSelectedCategory(value)}
+          defaultValue=""
+        >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            {jobsList.map((job) => (
-              <SelectItem key={job.jobId} value={job.position}>
-                {job.position}
-              </SelectItem>
-            ))}
+            <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
+            <SelectItem value="Masters">Finance Staff</SelectItem>
+            <SelectItem value="CollegeInstructors">
+              College Instructors
+            </SelectItem>
           </SelectContent>
         </Select>
-        {selectedCategory && selectedJob && (
-          <Input
-            type="text"
-            placeholder="Department"
-            value={selectedJob.department}
-            readOnly
-            className="w-48"
-          />
-        )}
-        <Button onClick={handleExport} className="bg-black text-white hover:bg-gray-800">
+        {/* Removed the Filter button */}
+        <Button variant="outline" onClick={exportToExcel} className="bg-black text-white">
           Export
         </Button>
       </div>
@@ -142,26 +114,33 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
       {/* Bulk Action Bar */}
       {selectedRowIds.length > 0 && (
         <div className="mb-4 flex items-center justify-between rounded bg-blue-50 p-2">
-          <p className="text-sm text-blue-700">{selectedRowIds.length} selected</p>
+          <p className="text-sm text-blue-700">
+            {selectedRowIds.length} selected
+          </p>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
               Bulk Action
             </Button>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedRowIds([])}>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedRowIds([])}
+            >
               Clear Selection
             </Button>
           </div>
         </div>
       )}
 
-      {/* Table or No Data */}
+      {/* Render Table or No Data */}
       {filteredApps.length === 0 ? (
-        <NoDataDesign message="No applications found." />
+        <NoDataDesign message="No hired applications found." />
       ) : (
         <div className="overflow-x-auto rounded bg-white shadow">
           <Table>
             <TableHeader>
               <TableRow>
+                {/* Header Checkbox */}
                 <TableHead>
                   <input
                     type="checkbox"
@@ -173,7 +152,6 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
                 <TableHead>Name</TableHead>
                 <TableHead>Degree</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Department</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date Applied</TableHead>
                 <TableHead>Documents</TableHead>
@@ -183,6 +161,7 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
             <TableBody>
               {filteredApps.map((app, i) => (
                 <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                  {/* Row Checkbox */}
                   <TableCell>
                     <input
                       type="checkbox"
@@ -194,16 +173,21 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
                   <TableCell>{app.fullName}</TableCell>
                   <TableCell>{app.educationDegree}</TableCell>
                   <TableCell>{app.applyingFor}</TableCell>
-                  <TableCell>{app.department}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{app.status}</Badge>
                   </TableCell>
-                  <TableCell>{dateStringFormatter(app.entryCreatedAt)}</TableCell>
+                  <TableCell>
+                    {dateStringFormatter(app.entryCreatedAt)}
+                  </TableCell>
                   <TableCell>{app.documents?.length || 0}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       variant="ghost"
-                      onClick={() => navigate(`/ApplicantDetails/${app.entryId}`)}
+                      onClick={() =>
+                        navigate(
+                          `/RemoveApprove/${app.accountId}/${app.entryId}` // Changed the route to HiredDetails
+                        )
+                      }
                       size="icon"
                     >
                       <Eye className="h-4 w-4" />
@@ -219,4 +203,4 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
   );
 };
 
-export default AllApplicantTable;
+export default HiredApplicantTable;

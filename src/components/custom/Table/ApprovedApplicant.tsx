@@ -21,6 +21,7 @@ import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import * as XLSX from "xlsx"; // Importing xlsx library
 
 const ApprovedApplicantTable = ({
   approvedApps,
@@ -28,7 +29,7 @@ const ApprovedApplicantTable = ({
   approvedApps: ApplicantData[];
 }) => {
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [selectedCategory, setSelectedCategory] = useState<string>(""); 
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
   // No Data design component
@@ -69,6 +70,21 @@ const ApprovedApplicantTable = ({
     }
   };
 
+  // Export to Excel function
+  const exportToExcel = () => {
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(filteredApps.map((app) => ({
+      Name: app.fullName,
+      Degree: app.educationDegree,
+      Category: app.applyingFor,
+      Status: app.status,
+      "Date Applied": dateStringFormatter(app.entryCreatedAt),
+      Documents: app.documents?.length || 0,
+    })));
+    XLSX.utils.book_append_sheet(wb, ws, "Approved Applicants");
+    XLSX.writeFile(wb, "approved_applicants.xlsx");
+  };
+
   return (
     <div>
       {/* Search and Filter Row */}
@@ -89,8 +105,9 @@ const ApprovedApplicantTable = ({
             </SelectItem>
           </SelectContent>
         </Select>
-        <Button>Filter</Button>
-        <Button variant="outline">Export</Button>
+        <Button variant="outline" onClick={exportToExcel} className="bg-black text-white">
+          Export
+        </Button>
       </div>
 
       {/* Bulk Action Bar */}
@@ -167,7 +184,7 @@ const ApprovedApplicantTable = ({
                       variant="ghost"
                       onClick={() =>
                         navigate(
-                          `/ApplicantDetails/${app.accountId}/${app.entryId}`
+                          `/HiredDetails/${app.accountId}/${app.entryId}` // Updated path to HiredDetails
                         )
                       }
                       size="icon"

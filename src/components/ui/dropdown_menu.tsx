@@ -9,15 +9,15 @@ type DropdownMenuItem = {
 };
 
 // DropdownMenuTrigger component
-export const DropdownMenuTrigger = ({ children }: { children: React.ReactNode }) => (
-  <button className="p-1 rounded-full hover:bg-gray-100">
+export const DropdownMenuTrigger = ({ children, onClick }: { children: React.ReactNode, onClick: () => void }) => (
+  <button className="p-1 rounded-full hover:bg-gray-100" onClick={onClick}>
     {children}
   </button>
 );
 
 // DropdownMenuContent component
 export const DropdownMenuContent = ({ children }: { children: React.ReactNode }) => (
-  <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md">
+  <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-md z-10">
     <ul>{children}</ul>
   </div>
 );

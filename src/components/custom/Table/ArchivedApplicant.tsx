@@ -21,6 +21,8 @@ import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const ArchivedApplicantTable = ({
   archivedApps,
@@ -69,48 +71,57 @@ const ArchivedApplicantTable = ({
     }
   };
 
+  // Export functionality
+  const handleExport = () => {
+    const exportData = filteredApps.map((app) => ({
+      Name: app.fullName,
+      Degree: app.educationDegree,
+      Category: app.applyingFor,
+      Status: app.status,
+      "Date Applied": dateStringFormatter(app.entryCreatedAt),
+      "Document Count": app.documents?.length || 0,
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Archived Applicants");
+
+    const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    const data = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(data, "ArchivedApplicants.xlsx");
+  };
+
   return (
     <div>
       {/* Search and Filter Row */}
       <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
         <Input type="text" placeholder="Search applicants" className="flex-1" />
-        <Select
-          onValueChange={(value) => setSelectedCategory(value)}
-          defaultValue=""
-        >
+        <Select onValueChange={(value) => setSelectedCategory(value)} defaultValue="">
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Bachelors">
-              Administrative Assistant
-            </SelectItem>
+            <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
             <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">
-              College Instructors
-            </SelectItem>
+            <SelectItem value="CollegeInstructors">College Instructors</SelectItem>
             <SelectItem value="CollegeFaculty">College Faculty</SelectItem>
           </SelectContent>
         </Select>
-        <Button>Filter</Button>
-        <Button variant="outline">Export</Button>
+        {/* Removed Filter button */}
+        <Button variant="outline" className="bg-black text-white" onClick={handleExport}>
+          Export
+        </Button>
       </div>
 
       {/* Bulk Action Bar */}
       {selectedRowIds.length > 0 && (
         <div className="mb-4 flex items-center justify-between rounded bg-blue-50 p-2">
-          <p className="text-sm text-blue-700">
-            {selectedRowIds.length} selected
-          </p>
+          <p className="text-sm text-blue-700">{selectedRowIds.length} selected</p>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
               Bulk Action
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSelectedRowIds([])}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setSelectedRowIds([])}>
               Clear Selection
             </Button>
           </div>
@@ -167,9 +178,7 @@ const ArchivedApplicantTable = ({
                     <Button
                       variant="ghost"
                       onClick={() =>
-                        navigate(
-                          `/ApplicantDetails/${app.accountId}/${app.entryId}`
-                        )
+                        navigate(`/ApplicantDetails/${app.accountId}/${app.entryId}`)
                       }
                       size="icon"
                     >

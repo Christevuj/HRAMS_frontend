@@ -7,7 +7,15 @@ export const AdminRoutes = [
     },
     {
         path: '/ApplicantDetails/:entryId',
-  component: lazy(() => import("../pages/private/admin/ApplicantDetails")),
+        component: lazy(() => import("../pages/private/admin/ApplicantDetails")),
+    },
+    {
+        path: '/HiredDetails/:entryId', // New route for HiredDetails
+        component: lazy(() => import("../pages/private/admin/HiredDetails")), // Make sure to import the correct path
+    },
+    {
+        path: '/RemoveApprove/:entryId',
+        component: lazy(() => import("../pages/private/admin/RemoveApprove")), // Added RemoveApprove route
     },
     {
         path:'/Job-list',
