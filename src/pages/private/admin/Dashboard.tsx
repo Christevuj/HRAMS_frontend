@@ -22,7 +22,7 @@ import AllApplicantTable from "@/components/custom/Table/AllApplicant"
 import PendingApplicantTable from "@/components/custom/Table/PendingApplicant"
 import ArchivedApplicantTable from "@/components/custom/Table/ArchivedApplicant"
 import RejectedApplicantTable from "@/components/custom/Table/RejectedApplicant"
-
+import ApprovedApplicantTable from "@/components/custom/Table/ApprovedApplicant"
 
 
 export default function AdminDashboard() {
@@ -41,6 +41,7 @@ export default function AdminDashboard() {
   const allApps = list
   const pendingApps = list.filter((app) => app.status === "PENDING")
   const shortlistedApps = list.filter((app) => app.status === "ARCHIVED")
+  const approvedApps = list.filter((app) => app.status === "APPROVED")
   const rejectedApps = list.filter((app) => app.status === "REJECTED")
 
     return (
@@ -112,8 +113,11 @@ export default function AdminDashboard() {
           <TabsList className="mb-4">
             <TabsTrigger className="px-8" value="all">All Applications</TabsTrigger>
             <TabsTrigger className="px-8" value="pending">Pending</TabsTrigger>
+
             <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
+            <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
             <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
+            
           </TabsList>
 
           {/* All Applications Tab */}
@@ -129,6 +133,11 @@ export default function AdminDashboard() {
           {/* Archived Tab */}
           <TabsContent value="archived">
           <ArchivedApplicantTable archivedApps={shortlistedApps} />
+          </TabsContent>
+
+              {/* Approved Tab */}
+          <TabsContent value="approved">
+          <ApprovedApplicantTable approvedApps={approvedApps} />
           </TabsContent>
 
           {/* Rejected Tab */}
