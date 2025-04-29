@@ -20,7 +20,9 @@ import { ApplicantData } from "@/types";
 import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { AllOpenJobsResponse, Job } from "@/types";
+import { AllOpenJobs } from "@/config/admin"; // Importing function to get all open jobs
 
 const RejectedApplicantTable = ({
   rejectedApps,
@@ -30,6 +32,24 @@ const RejectedApplicantTable = ({
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const [jobsList, setJobsList] = useState<Job[]>([]);
+
+  
+    // Fetch all available job positions for the dropdown
+    useEffect(() => {
+      const fetchJobs = async () => {
+        try {
+          const res: AllOpenJobsResponse = await AllOpenJobs();
+          if (res && res.success === 1) {
+            setJobsList(res.results);
+          }
+        } catch (error) {
+          console.error("Error fetching jobs:", error);
+        }
+      };
+  
+      fetchJobs();
+    }, []);
 
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
@@ -96,6 +116,26 @@ const RejectedApplicantTable = ({
     document.body.removeChild(link);
   };
 
+  // Fetch all available job positions for the dropdown (similar to PendingApplicantTable)
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        // Replace with your actual API or data fetching logic
+        const jobsList = [
+          { jobId: "1", position: "Administrative Assistant" },
+          { jobId: "2", position: "Finance Staff" },
+          { jobId: "3", position: "College Instructors" },
+          { jobId: "4", position: "College Faculty" },
+        ];
+        setJobsList(jobsList);
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
   return (
     <div>
       <div className="mb-4 flex flex-col items-center gap-2 sm:flex-row sm:gap-2">
@@ -108,15 +148,16 @@ const RejectedApplicantTable = ({
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
-            <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">College Instructors</SelectItem>
-            <SelectItem value="CollegeFaculty">College Faculty</SelectItem>
+            {jobsList.map((job) => (
+              <SelectItem key={job.jobId} value={job.position}>
+                {job.position}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
-        {/* Removed Filter Button */}
         <Button
-          className="bg-black text-white hover:bg-gray-800"
+          variant="default"
+          style={{ backgroundColor: "black", color: "white" }}
           onClick={handleExport}
         >
           Export

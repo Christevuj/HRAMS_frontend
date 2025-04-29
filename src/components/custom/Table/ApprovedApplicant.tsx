@@ -20,8 +20,10 @@ import { ApplicantData } from "@/types";
 import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx"; // Importing xlsx library
+import { AllOpenJobsResponse, Job } from "@/types";
+import { AllOpenJobs } from "@/config/admin"; // Importing function to get all open jobs
 
 const ApprovedApplicantTable = ({
   approvedApps,
@@ -31,6 +33,23 @@ const ApprovedApplicantTable = ({
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>(""); 
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const [jobsList, setJobsList] = useState<Job[]>([]);
+
+  // Fetch all available job positions for the dropdown
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res: AllOpenJobsResponse = await AllOpenJobs();
+        if (res && res.success === 1) {
+          setJobsList(res.results);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   // No Data design component
   const NoDataDesign = ({ message }: { message: string }) => (
@@ -98,11 +117,11 @@ const ApprovedApplicantTable = ({
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
-            <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">
-              College Instructors
-            </SelectItem>
+            {jobsList.map((job) => (
+              <SelectItem key={job.jobId} value={job.position}>
+                {job.position}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button variant="outline" onClick={exportToExcel} className="bg-black text-white">

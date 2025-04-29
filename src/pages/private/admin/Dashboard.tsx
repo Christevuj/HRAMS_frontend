@@ -113,10 +113,10 @@ export default function AdminDashboard() {
       <Tabs className="w-full" defaultValue="pending">
         <TabsList className="mb-4">
           <TabsTrigger className="px-8" value="pending">Pending</TabsTrigger>
-          <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
           <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
-          <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
           <TabsTrigger className="px-8" value="hired">Hired</TabsTrigger>
+          <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
           <TabsTrigger className="px-8" value="all">History</TabsTrigger>
         </TabsList>
 

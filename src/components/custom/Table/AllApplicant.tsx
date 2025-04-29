@@ -59,7 +59,8 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
   const filteredApps = allApps.filter((app) => {
     const matchesCategory = selectedCategory ? app.applyingFor === selectedCategory : true;
     const matchesSearch = app.fullName.toLowerCase().includes(searchText.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const isNotPending = app.status.toLowerCase() !== "pending";
+    return matchesCategory && matchesSearch && isNotPending;
   });
 
   const allSelected =
@@ -182,7 +183,12 @@ const AllApplicantTable = ({ allApps }: { allApps: ApplicantData[] }) => {
             </TableHeader>
             <TableBody>
               {filteredApps.map((app, i) => (
-                <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                <TableRow
+                  key={i}
+                  className={`hover:bg-gray-50 transition-colors ${
+                    app.status.toLowerCase() === "inactive" ? "bg-gray-200 text-gray-600" : ""
+                  }`}
+                >
                   <TableCell>
                     <input
                       type="checkbox"

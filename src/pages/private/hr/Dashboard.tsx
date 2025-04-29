@@ -25,6 +25,7 @@ import ApprovedApplicantTableOH from "@/components/officeheadtable/ApprovedAppli
 import PendingApplicantTableOH from "@/components/officeheadtable/PendingApplicant"
 import ArchivedApplicantTableOH from "@/components/officeheadtable/ArchivedApplicant"
 import RejectedApplicantTableOH from "@/components/officeheadtable/RejectedApplicant"
+import HiredApplicantTableOH from "@/components/officeheadtable/HiredApplicant"
 import useStore from "@/zustand/store/store"
 import { selector } from "@/zustand/store/store.provider"
 
@@ -39,7 +40,7 @@ export default function HeadDashboard() {
     const Fetch = async () => {
       const res = await ApplicantList()
       if (res?.results) {
-        const list = res?.results?.filter((v:any) => v.department === user.info?.department)
+        const list = res?.results?.filter((v: any) => v.department === user.info?.department)
         setList(list)
       }
     }
@@ -51,6 +52,7 @@ export default function HeadDashboard() {
   const approvedAppsOH = list.filter((app) => app.status === "APPROVED")
   const shortlistedApps = list.filter((app) => app.status === "ARCHIVED")
   const rejectedApps = list.filter((app) => app.status === "REJECTED")
+  const hiredApps = list.filter((app) => app.status === "HIRED")
 
   return (
     <div className="container mx-auto space-y-6 p-4 sm:p-6">
@@ -120,40 +122,39 @@ export default function HeadDashboard() {
       <Tabs className="w-full" defaultValue="all">
         <TabsList className="mb-4">
           <TabsTrigger className="px-8" value="all">All Applications</TabsTrigger>
-
           <TabsTrigger className="px-8" value="pending">Pending</TabsTrigger>
-          <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
           <TabsTrigger className="px-8" value="approved">Approved</TabsTrigger>
           <TabsTrigger className="px-8" value="rejected">Rejected</TabsTrigger>
+          <TabsTrigger className="px-8" value="hired">Hired</TabsTrigger>
+          <TabsTrigger className="px-8" value="archived">Archived</TabsTrigger>
         </TabsList>
 
-        {/* All Applications Tab */}
         <TabsContent value="all">
           <AllApplicantTableOH allAppsOH={allApps} />
         </TabsContent>
 
-        {/* Pending Tab */}
         <TabsContent value="pending">
-          <PendingApplicantTableOH pendingApps={pendingApps}  />
+          <PendingApplicantTableOH pendingApps={pendingApps} />
         </TabsContent>
 
-        {/* Archived Tab */}
         <TabsContent value="archived">
-         <ArchivedApplicantTableOH archivedApps={shortlistedApps} />
+          <ArchivedApplicantTableOH archivedApps={shortlistedApps} />
         </TabsContent>
 
-           {/* Approved Tab */}
-           <TabsContent value="approved">
+        <TabsContent value="approved">
           <ApprovedApplicantTableOH approvedAppsOH={approvedAppsOH} />
         </TabsContent>
 
-        {/* Rejected Tab */}
         <TabsContent value="rejected">
-        <RejectedApplicantTableOH rejectedApps={rejectedApps} />
+          <RejectedApplicantTableOH rejectedApps={rejectedApps} />
+        </TabsContent>
+
+        <TabsContent value="hired">
+          <HiredApplicantTableOH hiredApps={hiredApps} />
         </TabsContent>
       </Tabs>
 
-     
+
     </div>
   )
 }

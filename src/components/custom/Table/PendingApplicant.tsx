@@ -20,9 +20,11 @@ import { ApplicantData } from "@/types";
 import { dateStringFormatter } from "@/utils";
 import { Eye, Inbox } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { AllOpenJobsResponse, Job } from "@/types";
+import { AllOpenJobs } from "@/config/admin"; // Importing function to get all open jobs
 
 const PendingApplicantTable = ({
   pendingApps,
@@ -32,6 +34,23 @@ const PendingApplicantTable = ({
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
+  const [jobsList, setJobsList] = useState<Job[]>([]);
+
+  // Fetch all available job positions for the dropdown
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const res: AllOpenJobsResponse = await AllOpenJobs();
+        if (res && res.success === 1) {
+          setJobsList(res.results);
+        }
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
 
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
@@ -40,6 +59,7 @@ const PendingApplicantTable = ({
     </div>
   );
 
+  // Filter pending applications by category (applyingFor)
   const filteredApps = selectedCategory
     ? pendingApps.filter((app) => app.applyingFor === selectedCategory)
     : pendingApps;
@@ -100,14 +120,11 @@ const PendingApplicantTable = ({
             <SelectValue placeholder="Select Category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Bachelors">
-              Administrative Assistant
-            </SelectItem>
-            <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">
-              College Instructors
-            </SelectItem>
-            <SelectItem value="CollegeFaculty">College Faculty</SelectItem>
+            {jobsList.map((job) => (
+              <SelectItem key={job.jobId} value={job.position}>
+                {job.position}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Button

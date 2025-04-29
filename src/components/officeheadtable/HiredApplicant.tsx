@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -15,21 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import { ApplicantData } from "@/types";
 import { dateStringFormatter } from "@/utils";
 import { Inbox } from "lucide-react";
 import { useState } from "react";
 
-const ApprovedApplicantTableOH = ({
-  approvedAppsOH,
-  setArchivedList, // Receive setArchivedList from the parent
+const HiredApplicantTableOH = ({
+  hiredApps,
 }: {
-  approvedAppsOH: ApplicantData[];
-  setArchivedList: React.Dispatch<React.SetStateAction<ApplicantData[]>>; // Pass setArchivedList to the component
+  hiredApps: ApplicantData[];
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
-  const [approvedList, setApprovedList] = useState<ApplicantData[]>(approvedAppsOH);
+  const [selectedRowIds, setSelectedRowIds] = useState<string[]>([]);
 
   const NoDataDesign = ({ message }: { message: string }) => (
     <div className="flex flex-col items-center justify-center w-full border min-h-[100px] py-10">
@@ -38,23 +36,30 @@ const ApprovedApplicantTableOH = ({
     </div>
   );
 
-  // Filter approved applications by category (applyingFor)
   const filteredApps = selectedCategory
-    ? approvedList.filter((app) => app.applyingFor === selectedCategory)
-    : approvedList;
+    ? hiredApps.filter((app) => app.applyingFor === selectedCategory)
+    : hiredApps;
 
-  // Archive handler
-  const handleArchive = (index: number) => {
-    const appToArchive = filteredApps[index];
-    
-    // Remove from approved list
-    setApprovedList((prev) => prev.filter((app) => app !== appToArchive)); 
+  const allSelected =
+    filteredApps.length > 0 &&
+    filteredApps.every((app) => selectedRowIds.includes(app.entryId.toString()));
 
-    // Add to archived list in the parent component
-    setArchivedList((prev) => [...prev, appToArchive]); 
+  const toggleRow = (entryId: number) => {
+    const idStr = entryId.toString();
+    setSelectedRowIds((prev) =>
+      prev.includes(idStr)
+        ? prev.filter((id) => id !== idStr)
+        : [...prev, idStr]
+    );
+  };
 
-    // Optionally log or display a success message
-    console.log(`${appToArchive.fullName} has been archived.`);
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = filteredApps.map((app) => app.entryId.toString());
+      setSelectedRowIds(allIds);
+    } else {
+      setSelectedRowIds([]);
+    }
   };
 
   return (
@@ -72,32 +77,58 @@ const ApprovedApplicantTableOH = ({
           <SelectContent>
             <SelectItem value="Bachelors">Administrative Assistant</SelectItem>
             <SelectItem value="Masters">Finance Staff</SelectItem>
-            <SelectItem value="CollegeInstructors">
-              College Instructors
-            </SelectItem>
+            <SelectItem value="CollegeInstructors">College Instructors</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
+      {/* Bulk Action Bar */}
+      {selectedRowIds.length > 0 && (
+        <div className="mb-4 flex items-center justify-between rounded bg-blue-50 p-2">
+          <p className="text-sm text-blue-700">{selectedRowIds.length} selected</p>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="sm">Bulk Action</Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedRowIds([])}>
+              Clear Selection
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Render Table or No Data */}
       {filteredApps.length === 0 ? (
-        <NoDataDesign message="No approved applications found." />
+        <NoDataDesign message="No hired applications found." />
       ) : (
         <div className="overflow-x-auto rounded bg-white shadow">
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={(e) => handleSelectAll(e.target.checked)}
+                    className="h-4 w-4 cursor-pointer"
+                  />
+                </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Degree</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Date Applied</TableHead>
-                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredApps.map((app, i) => (
                 <TableRow key={i} className="hover:bg-gray-50 transition-colors">
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedRowIds.includes(app.entryId.toString())}
+                      onChange={() => toggleRow(app.entryId)}
+                      className="h-4 w-4 cursor-pointer"
+                    />
+                  </TableCell>
                   <TableCell>{app.fullName}</TableCell>
                   <TableCell>{app.educationDegree}</TableCell>
                   <TableCell>{app.applyingFor}</TableCell>
@@ -105,15 +136,6 @@ const ApprovedApplicantTableOH = ({
                     <Badge variant="outline">{app.status}</Badge>
                   </TableCell>
                   <TableCell>{dateStringFormatter(app.entryCreatedAt)}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleArchive(i)} // Trigger archive
-                    >
-                      Archive
-                    </Button>
-                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -124,4 +146,4 @@ const ApprovedApplicantTableOH = ({
   );
 };
 
-export default ApprovedApplicantTableOH;
+export default HiredApplicantTableOH;
