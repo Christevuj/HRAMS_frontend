@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { logoutUser } from "@/zustand/store/store.provider";
+import { Link } from 'react-router-dom';
+
 
 const HeadHeader = () => {
   const navigate = useNavigate();
@@ -63,11 +65,9 @@ const HeadHeader = () => {
         <div className="flex items-center space-x-8">
           {/* Brand */}
           <div className="text-xl font-bold text-gray-800 tracking-wide">
-            <img
-              src="/logo.png"
-              className="w-16  rounded-sm p-2"
-              alt="Logo"
-            />
+          <Link to="/" className="text-xl font-bold text-gray-800 tracking-wide">
+  <img src="/logo.png" className="w-16" alt="Logo" />
+</Link>
           </div>
 
           {/* Navigation Menu */}

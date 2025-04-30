@@ -21,11 +21,9 @@ export function Header() {
     { label: "About", path: "#about" },
   ]
 
-  const authNavLinks = isAuthenticated
-    ? [{ label: "My Application", path: "/My-Application" }]
-    : []
+ 
 
-  const navLinks = [...baseNavLinks, ...authNavLinks]
+  const navLinks = baseNavLinks
 
   const handleLogout = () => {
     logoutUser()
@@ -77,21 +75,13 @@ export function Header() {
                 Apply Now
               </Button>
               <Button
-                className={isScrolled ? "text-[#e65b7a]" : "text-[#e65b7a]"}
-                variant="outline"
-                onClick={handleLogout}
-              >
-                Logout
+               variant="outline"
+               className="text-[#e65b7a] bg-white"
+               onClick={() => navigate("/login")}
+             >
+               Login
               </Button>
-              <Avatar>
-                <AvatarImage
-                  src={userInfo?.avatar || "https://github.com/shadcn.png"}
-                  alt="User Avatar"
-                />
-                <AvatarFallback>
-                  {userInfo?.fullName?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
+              
             </>
           ) : (
             <Button

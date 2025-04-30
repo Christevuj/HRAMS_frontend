@@ -58,10 +58,14 @@ export default function ApplicantDetails() {
       const response = await UpdateApplicantStatus(formData);
       toast.success(response.results || "Status updated successfully.");
       Fetch();
-    } catch (error: any) {
-      console.error("Error updating status:", error);
-      toast.error(error.message || "Error updating status.");
-    } finally {
+   } catch (error) {
+  if (error instanceof Error) {
+    toast.error(error.message);
+  } else {
+    toast.error("An unexpected error occurred.");
+  }
+}
+finally {
       setIsUpdating(false);
     }
   };
@@ -145,35 +149,40 @@ export default function ApplicantDetails() {
         {user.info.userType !== "hr" ? (
           <div className="flex justify-end space-x-4 -t border-gray-300">
             <Button
-              disabled={isUpdating}
-              className={`${applicant.status === "APPROVED"
-                ? "bg-white text-pink-500 border border-pink-500"
-                : "bg-pink-500 text-white"
-                }`}
-              onClick={() => handleApplicantStatusChange("APPROVED")}
-            >
-              Approve
-            </Button>
-            <Button
-              disabled={isUpdating}
-              className={`${applicant.status === "ARCHIVED"
-                ? "bg-white text-pink-500 border border-pink-500"
-                : "bg-pink-500 text-white"
-                }`}
-              onClick={() => handleApplicantStatusChange("ARCHIVED")}
-            >
-              Archive
-            </Button>
-            <Button
-              disabled={isUpdating}
-              className={`${applicant.status === "REJECTED"
-                ? "bg-white text-pink-500 border border-pink-500"
-                : "bg-pink-500 text-white"
-                }`}
-              onClick={() => handleApplicantStatusChange("REJECTED")}
-            >
-              Reject
-            </Button>
+  disabled={isUpdating}
+  style={{
+    backgroundColor: applicant.status === "APPROVED" ? "#ffffff" : "#e65a96",
+    color: applicant.status === "APPROVED" ? "#e65a96" : "#ffffff",
+    border: `1px solid #e65a96`,
+  }}
+  onClick={() => handleApplicantStatusChange("APPROVED")}
+>
+  Approve
+</Button>
+<Button
+  disabled={isUpdating}
+  style={{
+    backgroundColor: applicant.status === "ARCHIVED" ? "#ffffff" : "#e65a96",
+    color: applicant.status === "ARCHIVED" ? "#e65a96" : "#ffffff",
+    border: "1px solid #e65a96",
+  }}
+  onClick={() => handleApplicantStatusChange("ARCHIVED")}
+>
+  Archive
+</Button>
+
+<Button
+  disabled={isUpdating}
+  style={{
+    backgroundColor: applicant.status === "REJECTED" ? "#ffffff" : "#e65a96",
+    color: applicant.status === "REJECTED" ? "#e65a96" : "#ffffff",
+    border: "1px solid #e65a96",
+  }}
+  onClick={() => handleApplicantStatusChange("REJECTED")}
+>
+  Reject
+</Button>
+
           </div>
         ) : (
           <div className="text-right pt-8 border-t border-gray-300">

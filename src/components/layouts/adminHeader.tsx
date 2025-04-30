@@ -65,9 +65,9 @@ const AdminHeader = () => {
         {/* Left: Brand + Nav */}
         <div className="flex items-center space-x-8">
           {/* Brand */}
-          <div className="text-xl font-bold text-gray-800 tracking-wide">
-            <img src="/logo.png" className="w-16" alt="Logo" />
-          </div>
+          <Link to="/" className="text-xl font-bold text-gray-800 tracking-wide">
+  <img src="/logo.png" className="w-16" alt="Logo" />
+</Link>
 
           {/* Navigation Menu */}
           <nav className="flex space-x-4">

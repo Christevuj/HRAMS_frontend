@@ -91,7 +91,7 @@ export default function ApplicationForm() {
         applicationLetter: null,
         resume: null,
       });
-      navigate("/My-Application");
+      navigate("/");
     } catch (error: any) {
       console.error("Error submitting application:", error);
       toast.error(`Error submitting application: ${error.message}`);

@@ -18,9 +18,10 @@ const Home = () => {
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-24 text-center text-white">
         <h2 className="text-xl font-semibold">HRAMS Portal</h2>
-        <h1 className="text-3xl font-bold md:text-5xl">
-          Welcome to UIC Human Resource Applicant Management System
-        </h1>
+        <h1 className="text-3xl font-bold md:text-5xl leading-tight md:leading-snug mt-2 mb-2">
+  Welcome to UIC Human Resource Applicant Management System
+</h1>
+
         <p className="mt-2 max-w-2xl text-gray-200 md:text-lg">
           Welcome to the HRAMS Portal of the Human Resource Office at the
           University of the Immaculate Conception (UIC). This platform allows

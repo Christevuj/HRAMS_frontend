@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { LoginAccount } from "@/config/applicant";
 import { saveUserInfo } from "@/zustand/store/store.provider";
 import { useNavigate } from "react-router-dom";
+import  { Link } from "react-router-dom";
 
 interface LoginFormState {
   email: string;
@@ -78,7 +79,13 @@ export default function LoginPage() {
 
     <CardContent>
     <div className="text-center mb-8">
-  <h1 className="text-5xl font-bold text-gray-800 mb-4">Log In</h1>
+    <Link to="/">
+  <h1 className="text-5xl font-bold text-gray-800 mb-4 ">
+    Log In
+  </h1>
+</Link>
+
+
   <p className="text-gray-600">Login to your account</p>
 </div>
 
